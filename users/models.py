@@ -6,10 +6,7 @@ from django.db import models
 
 
 class Profile(models.Model):
-    """Profile model.
-    
-    Proxy model that extends the base data with other information.
-    """
+    """Profile model."""
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
