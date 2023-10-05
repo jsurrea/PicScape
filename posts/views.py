@@ -1,52 +1,57 @@
-"""Post views"""
-
 # Django
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView
-
-# Forms
-from posts.forms import PostForm
 
 # Models
 from posts.models import Post
 
 
-class PostDetailView(LoginRequiredMixin, DetailView):
-    template_name = 'posts/detail.html'
-    queryset = Post.objects.all()
-    context_object_name = 'posts'
-
-
 class PostsFeedView(LoginRequiredMixin, ListView):
-    """Return all published posts"""
-    template_name = 'posts/feed.html'
+    """
+    Return all published posts
+    """
     model = Post
+    paginate_by = 5
     ordering = ('-created')
-    paginate_by = 30
     context_object_name = 'posts'
+    template_name = 'posts/feed.html'
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    """
+    Return post detail.
+    """
+    template_name = 'posts/detail.html'
+    model = Post
+    context_object_name = 'post'
+    slug_field = 'pk'
+    slug_url_kwarg = 'pk'
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
-    """Create a new post"""
-    model = Post  # modelo donde se toma la info
-    template_name = 'posts/new.html'  # template donde recibe la info
-    # form_class = PostForm
-    fields = ['title', 'photo']
+    """
+    Create a new post.
+    """
+    model = Post
+    template_name = 'posts/new.html'
+    fields = [
+        'title',
+        'photo'
+    ]
 
-    def form_valid(self, form):  # validacion formulario
+    def form_valid(self, form):
+        """
+        Validate form.
+        """
         form.instance.user = self.request.user
-        form.instance.profile = self.request.user.profile
-        print(form)
-        form.save()  # guardar datos de formtulario en bd
+        form.save()
         return super(CreatePostView, self).form_valid(form)
 
-    def get_success_url(self):  # retorno despues de guardado exitoso
-        return reverse('posts:feed')
-
-
-@login_required
-def like_post(request, user1, user2):
-    pass
+    def get_success_url(self):
+        """
+        Return to post's feed.
+        """
+        return reverse('posts:detail', kwargs={'pk': self.object.pk})
+        

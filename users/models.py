@@ -1,9 +1,19 @@
-"""Users models."""
-
 # Django
 from django.contrib.auth.models import User
 from django.db import models
 
+# Utilities
+import os
+
+
+def picture_upload_path(instance, filename):
+    """
+    Return the path to the profile picture.
+    """
+    username = instance.user.username
+    extension = filename.split('.')[-1]
+    unique_filename = f"{username}.{extension}"
+    return os.path.join('users', 'pictures', unique_filename)
 
 class Profile(models.Model):
     """
@@ -20,7 +30,7 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
 
     picture = models.ImageField(
-        upload_to='users/pictures',
+        upload_to=picture_upload_path,
         blank=True,
         null=True
     )
@@ -31,11 +41,12 @@ class Profile(models.Model):
 
     posts_count = models.IntegerField(default=0)
 
-    def __str__(self):
-        """Return username."""
-        return self.user.username
-
-
-class Follow(models.Model):
     followers = models.IntegerField(default=0)
+    
     following = models.IntegerField(default=0)
+
+    def __str__(self):
+        """
+        Return username.
+        """
+        return self.user.username

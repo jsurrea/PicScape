@@ -1,5 +1,3 @@
-"""Users URLs."""
-
 # Django
 from django.urls import path
 
@@ -16,7 +14,7 @@ urlpatterns = [
     ),
     path(
         route='logout/',
-        view=views.logout_view,
+        view=views.LogoutView.as_view(),
         name='logout'
     ),
     path(
@@ -25,22 +23,16 @@ urlpatterns = [
         name='signup'
     ),
     path(
-        route='me/profile/',
-        view=views.UpdateProfileView.as_view(),
-        name='update_profile'
+        route='me/',
+        view=views.ProfileUpdateView.as_view(),
+        name='profile'
     ),
 
     # Posts
     path(
-        route='<str:username>/',
-        view=views.UserDetailView.as_view(),
+        route='u/<str:username>/',
+        view=views.ProfileDetailView.as_view(),
         name='detail'
-    ),
-
-    path(
-        route='<str:user1>/<str:user2>/',
-        view=views.follow_user,
-        name='follow'
     ),
 
 ]

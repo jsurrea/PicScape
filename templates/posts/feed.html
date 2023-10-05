@@ -1,15 +1,19 @@
 {% extends "base.html" %}
 
 {% block head_content %}
-    <title>Platzigram</title>
+    <title>PicScape</title>
 {% endblock%}
 
 {% block container %}
     <div class="container">
         <div class="row">
-
+            {% if not posts %}
+                <div class="col-12 mt-5">
+                    <h2 class="text-center">No posts yet</h2>
+                </div>
+            {% endif %}
             {% for post in posts %}
-                {% include "posts/post_card.html"%}
+                {% include "posts/post.html"%}
             {% endfor %}
         </div>
     </div>
@@ -22,11 +26,13 @@
                 </a>
             </li>
             {% endif %}
+            {% if posts %}
             <li class="page-item">
                 <a class="page-link" href="#">
                     {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
                 </a>
             </li>
+            {% endif %}
             {% if page_obj.has_next %}
             <li class="page-item">
                 <a class="page-link" href="?page={{ page_obj.next_page_number }}">

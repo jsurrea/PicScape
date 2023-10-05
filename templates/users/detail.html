@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head_content %}
-<title>@{{ user.username }} | Platzigram</title>
+    <title>@{{ user.username }} | PicScape</title>
 {% endblock %}
 
 {% block container %}
@@ -9,7 +9,7 @@
     <div class="container mb-5" style="margin-top: 8em;">
         <div class="row">
             <div class="col-sm-4 d-flex justify-content-center">
-                <img src="{{ user.profile.picture.url }}" alt="@{{ user.username}}" class="rounded-circle" width="150px" />
+                <img src="{{ user.profile.picture.url }}" alt="@{{ user.username }}" class="rounded-circle" width="150px" />
             </div>
             <div class="col-sm-8">
                 <h2 style="font-weight: 100;">
@@ -17,7 +17,7 @@
                     {% if user == request.user %}
                     
                         <a
-                            href="{% url 'users:update_profile' %}"
+                            href="{% url 'users:profile' %}"
                             class="ml-5 btn btn-sm btn-outline-info"
                         >
                             Edit profile
@@ -57,7 +57,7 @@
         <div class="row mt-3">
             {% for post in posts %}
             <div class="col-sm-4 pt-5 pb-5 pr-5 pl-5 d-flex justify-content-center align-items-center">
-                <a href="" class="border">
+                <a href="{% url 'posts:detail' post.pk %}" class="border">
                     <img src="{{ post.photo.url }}" alt="{{ post.title }}" class="img-fluid"/>
                 </a>
             </div>
