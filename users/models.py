@@ -6,7 +6,10 @@ from django.db import models
 
 
 class Profile(models.Model):
-    """Profile model."""
+    """
+    Profile model.
+    Proxy model that extends the base data with other information.
+    """
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -26,6 +29,13 @@ class Profile(models.Model):
 
     modified = models.DateTimeField(auto_now=True)
 
+    posts_count = models.IntegerField(default=0)
+
     def __str__(self):
         """Return username."""
         return self.user.username
+
+
+class Follow(models.Model):
+    followers = models.IntegerField(default=0)
+    following = models.IntegerField(default=0)

@@ -1,45 +1,52 @@
-"""Posts views."""
+"""Post views"""
 
 # Django
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.urls import reverse_lazy, reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import CreateView
 
-# Utilities
-from datetime import datetime
+# Forms
+from posts.forms import PostForm
+
+# Models
+from posts.models import Post
 
 
-posts = [
-    {
-        'title': 'Mont Blanc',
-        'user': {
-            'name': 'Yésica Cortés',
-            'picture': 'https://picsum.photos/60/60/?image=1027'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/200/200/?image=1036',
-    },
-    {
-        'title': 'Via Láctea',
-        'user': {
-            'name': 'Christian Van der Henst',
-            'picture': 'https://picsum.photos/60/60/?image=1005'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/200/200/?image=903',
-    }, 
-    {
-        'title': 'Nuevo auditorio',
-        'user': {
-            'name': 'Uriel (thespianartist)',
-            'picture': 'https://picsum.photos/60/60/?image=883'
-        },
-        'timestamp': datetime.now().strftime('%b %dth, %Y - %H:%M hrs'),
-        'photo': 'https://picsum.photos/200/200/?image=1076',
-    }
-]
+class PostDetailView(LoginRequiredMixin, DetailView):
+    template_name = 'posts/detail.html'
+    queryset = Post.objects.all()
+    context_object_name = 'posts'
+
+
+class PostsFeedView(LoginRequiredMixin, ListView):
+    """Return all published posts"""
+    template_name = 'posts/feed.html'
+    model = Post
+    ordering = ('-created')
+    paginate_by = 30
+    context_object_name = 'posts'
+
+
+class CreatePostView(LoginRequiredMixin, CreateView):
+    """Create a new post"""
+    model = Post  # modelo donde se toma la info
+    template_name = 'posts/new.html'  # template donde recibe la info
+    # form_class = PostForm
+    fields = ['title', 'photo']
+
+    def form_valid(self, form):  # validacion formulario
+        form.instance.user = self.request.user
+        form.instance.profile = self.request.user.profile
+        print(form)
+        form.save()  # guardar datos de formtulario en bd
+        return super(CreatePostView, self).form_valid(form)
+
+    def get_success_url(self):  # retorno despues de guardado exitoso
+        return reverse('posts:feed')
 
 
 @login_required
-def list_posts(request):
-    """List existing posts."""
-    return render(request, 'posts/feed.html', {'posts': posts})
+def like_post(request, user1, user2):
+    pass

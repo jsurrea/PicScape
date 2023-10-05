@@ -52,6 +52,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
+    # Local middlewares
     "platzigram.middleware.ProfileCompletionMiddleware",
 ]
 
@@ -62,8 +64,6 @@ TEMPLATES = [
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
             BASE_DIR / "templates",
-            BASE_DIR / "templates" / "posts",
-            BASE_DIR / "templates" / "users",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
