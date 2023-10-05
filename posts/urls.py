@@ -12,14 +12,19 @@ urlpatterns = [
         name='feed'
     ),
     path(
-        route='posts/<int:pk>',
+        route='p/<int:pk>/',
         view=views.PostDetailView.as_view(),
         name='detail'
     ),
     path(
-        route='posts/new/',
+        route='p/new/',
         view=views.CreatePostView.as_view(),
         name='create'
+    ),
+    path(
+        route='l/<int:pk>/',
+        view=views.LikeView.as_view(),
+        name='like'
     ),
   
 ]

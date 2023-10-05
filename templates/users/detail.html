@@ -25,22 +25,26 @@
                     {% else %}
                     
                         <a
-                            href="{% url 'users:follow' user request.user %}"
+                            href="{% url 'users:follow' user %}"
                             class="ml-5 btn btn-sm btn-primary"
                         >
-                      Follow
+                        {% if is_following %} 
+                            Unfollow 
+                        {% else %} 
+                            Follow 
+                        {% endif %}
                         </a>
                     {% endif %}
                 </h2>
                 <div class="row mt-2" style="font-size: 1.2em">
                     <div class="col-sm-4">
-                        <b>{{ user.profile.posts_count }}</b> posts
+                        <b>{{ posts_count }}</b> posts
                     </div>
                     <div class="col-sm-4">
-                        <b>{{followers}}</b> followers
+                        <b>{{ followers_count }}</b> followers
                     </div>
                     <div class="col-sm-4">
-                        <b>{{following}}</b> following
+                        <b>{{ following_count }}</b> following
                     </div>
                 </div>
                 <div class="row mt-4">

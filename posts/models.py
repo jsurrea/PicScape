@@ -22,7 +22,7 @@ class Post(models.Model):
     Post model.
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     
     title = models.CharField(max_length=255)
 
@@ -32,11 +32,21 @@ class Post(models.Model):
 
     modified = models.DateTimeField(auto_now=True)
 
-    likes = models.IntegerField(default=0)
-
     def __str__(self):
         """
         Return title and username.
         """
         return '{} by @{}'.format(self.title, self.user.username)
         
+
+class Likes(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
+
+    def __str__(self):
+        """
+        Return username and title.
+        """
+        return '{} likes {}'.format(self.user.username, self.post.title)

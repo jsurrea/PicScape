@@ -28,11 +28,16 @@ urlpatterns = [
         name='profile'
     ),
 
-    # Posts
+    # Profiles
     path(
         route='u/<str:username>/',
         view=views.ProfileDetailView.as_view(),
         name='detail'
+    ),
+    path(
+        route='f/<str:username>/',
+        view=views.FollowView.as_view(),
+        name='follow'
     ),
 
 ]

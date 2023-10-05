@@ -39,14 +39,23 @@ class Profile(models.Model):
 
     modified = models.DateTimeField(auto_now=True)
 
-    posts_count = models.IntegerField(default=0)
-
-    followers = models.IntegerField(default=0)
-    
-    following = models.IntegerField(default=0)
-
     def __str__(self):
         """
         Return username.
         """
         return self.user.username
+
+
+class Follows(models.Model):
+
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+
+    followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')
+
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """
+        Return username of both.
+        """
+        return f"{self.follower} follows {self.followee}"

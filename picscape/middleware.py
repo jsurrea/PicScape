@@ -18,6 +18,8 @@ class ProfileCompletionMiddleware:
         """
         Code to be executed for each request before the view is called.
         """
+        if request.user.is_staff and not request.path.startswith(reverse('admin:index')):
+            return redirect(reverse('admin:index'))
         if (
             request.user.is_anonymous
             or request.user.is_anonymous

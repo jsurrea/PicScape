@@ -1,13 +1,14 @@
 # Django
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import views as auth_views
-from django.views.generic import DetailView, FormView, UpdateView
+from django.views.generic import DetailView, FormView, UpdateView, RedirectView
 from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
 
 # Models
 from django.contrib.auth.models import User
 from posts.models import Post
-from users.models import Profile
+from users.models import Profile, Follows
 
 # Forms
 from users.forms import SignupForm
@@ -97,14 +98,50 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
         Add user's posts to context
         """
         context = super().get_context_data(**kwargs)
-        user = self.get_object()
-        context['posts'] = Post.objects.filter(user=user).order_by('-created')
-        usr = Profile.objects.get(user=user)
-        usr.posts_count = Post.objects.filter(user=user).count()
-        usr.save()
+        followee = self.get_object()
+        follower = self.request.user
 
-        #context['followers'] = Follow.objects.filter(following=usr_id).count()
-        #context['following'] = Follow.objects.filter(followers=usr_id).count()
+        context['is_following'] = Follows.objects.filter(
+            follower=follower,
+            followee=followee,
+        ).exists()
+
+        context['posts_count'] = self.get_object().posts.count()
+        context['followers_count'] = self.get_object().followers.count()
+        context['following_count'] = self.get_object().following.count()
 
         return context
 
+
+class FollowView(LoginRequiredMixin, RedirectView):
+    """
+    Follow or unfollow a user.
+    """
+    pattern_name = 'users:detail'
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        username = kwargs['username']
+        followee = get_object_or_404(User, username=username)
+        follower = self.request.user
+
+        # Check if the user is already following
+        follow_exists = Follows.objects.filter(
+            follower=follower,
+            followee=followee,
+        ).exists()
+
+        if follow_exists:
+            # If already following, unfollow
+            Follows.objects.filter(
+                follower=follower,
+                followee=followee,
+            ).delete()
+        else:
+            # If not following, follow
+            Follows.objects.create(
+                follower=follower,
+                followee=followee,
+            )
+
+        return super().get_redirect_url(*args, **kwargs)
