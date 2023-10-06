@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('PICSCAPE_SECRET_KEY', 'django-insecure-pcd#=y&javeo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost"]
 
 
 # Application definition
