@@ -220,6 +220,19 @@ Update the variable to include your domain or IP:
 ALLOWED_HOSTS = ['ec2-54-152-101-7.compute-1.amazonaws.com']
 ```
 
+Set the Debug mode to False:
+
+```python
+DEBUG = False
+```
+
+Set the root for static files (you might need to delete the STATICFILES_DIRS if you decide to set them in the same location):
+
+```python
+STATIC_ROOT = BASE_DIR / "static"
+# STATICFILES_DIRS = [BASE_DIR / "static"]
+```
+
 Save the file and escape vim with `ESC` key followed by `:wq`.
 
 ## Sanity Check
