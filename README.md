@@ -32,7 +32,7 @@ PicScape is a project designed to showcase the power of Django in building a mod
 
 ## Demo
 
-You can see a live demo of PicScape at [https://www.picscape-demo.com](https://www.picscape-demo.com).
+You can see a live demo of PicScape at [https://ec2-52-205-197-58.compute-1.amazonaws.com](https://ec2-52-205-197-58.compute-1.amazonaws.com).
 
 This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings.
 
@@ -42,7 +42,7 @@ Follow these steps to set up PicScape on your machine:
 
 ### VM configuration
 
-Follow the deployment installation guide [here](deployment.md) for complete instructions on setting up the proyect in a virtual machine on a cloud provider. Learn how to configure a PostgreSQL database, a NGINX web server and to run the Django project with Gunicorn.
+Follow the deployment installation guide [here](deployment.md) for complete instructions on setting up the proyect on a Linux VPS with a cloud provider. Learn how to configure a PostgreSQL database, a NGINX web server and to run the Django project with Gunicorn.
 
 ### Prerequisites
 
