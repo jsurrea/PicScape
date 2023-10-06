@@ -46,10 +46,10 @@ sudo apt-get update && sudo apt-get upgrade
 
 ### Creating a New User
 
-Create a new user without a home directory with sudo privileges.
+Create a new user with a home directory with sudo privileges.
 
 ```bash
-sudo useradd -g sudo -M picscape
+sudo useradd -g sudo -m picscape
 ```
 
 Set a secure password for the new user:
@@ -217,7 +217,7 @@ vim picscape/settings.py
 Update the variable to include your domain or IP:
 
 ```python
-ALLOWED_HOSTS = ['ec2-54-84-180-155.compute-1.amazonaws.com']
+ALLOWED_HOSTS = ['ec2-54-152-101-7.compute-1.amazonaws.com']
 ```
 
 Save the file and escape vim with `ESC` key followed by `:wq`.
@@ -279,7 +279,7 @@ rm sites-*/default
 vim sites-available/app
 ```
 
-Add the following configuration to the file, replacing `ec2-54-84-180-155.compute-1.amazonaws.com` with your domain and the `static` and `media` directories:
+Add the following configuration to the file, replacing `ec2-54-152-101-7.compute-1.amazonaws.com` with your domain and the `static` and `media` directories:
 
 ```nginx
 upstream django_app {
@@ -289,19 +289,19 @@ upstream django_app {
 server {
 
     listen 80;
-    server_name ec2-54-84-180-155.compute-1.amazonaws.com;
+    server_name ec2-54-152-101-7.compute-1.amazonaws.com;
 
     access_log /var/log/nginx/app.log;
     error_log /var/log/nginx/app.error.log;
 
     location /static {
         autoindex on;
-        alias /home/picscape/picscape/static/;
+        alias /srv/www/picscape/static;
     }
 
     location /media {
         autoindex on;
-        alias /home/picscape/picscape/media/;
+        alias /srv/www/picscape/media;
     }
 
     location / {
@@ -349,8 +349,8 @@ Paste the following content into the file and save it:
 #!/bin/bash
 
 NAME="picscape"
-VIRTUALENV="/home/picscape/.venv/"
-DJANGODIR="/home/picscape/picscape/"
+VIRTUALENV="/srv/www/.venv/"
+DJANGODIR="/srv/www/picscape/"
 USER=picscape
 GROUP=sudo
 NUM_WORKERS=3
@@ -434,18 +434,18 @@ Add the following content to the `picscape` file:
 case "$1" in
   start)
     echo "Starting PicScape Service"
-    /home/picscape/picscape/deploy/gunicorn_start
+    /srv/www/picscape/deploy/gunicorn_start
     ;;
   stop)
     echo "Stopping PicScape Service"
     # Add any stop commands here, if needed
     ;;
   restart)
-    echo "Restarting Platzi Service"
-    /home/picscape/picscape/deploy/gunicorn_start
+    echo "Restarting PicScape Service"
+    /srv/www/picscape/deploy/gunicorn_start
     ;;
   *)
-    echo "Usage: /etc/init.d/platzi {start|stop|restart}"
+    echo "Usage: /etc/init.d/picscape {start|stop|restart}"
     exit 1
     ;;
 esac
