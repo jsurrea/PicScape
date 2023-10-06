@@ -34,7 +34,23 @@ PicScape is a project designed to showcase the power of Django in building a mod
 
 You can see a live demo of PicScape at [https://ec2-54-152-101-7.compute-1.amazonaws.com](https://ec2-54-152-101-7.compute-1.amazonaws.com).
 
-This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings. The demo comes with 3 users: `JessiTrips`, `DogWorld` and `Bob&Sons`. There's also an `admin` user for accesing the superuser dashboard. All of them have their passwords set to `1234`.
+This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings. The demo comes with 3 users: `JessiTrips`, `DogWorld` and `Bob&Sons`. There's also an `admin` user for accesing the superuser dashboard. All of them have their passwords set to `1234`. Here are some reference pictures that highlight features of this project:
+
+### Admin
+
+![admin](https://github.com/jsurrea/PicScape/assets/68788933/105a60e0-a225-4459-a6f2-c2b1824ce2fd)
+
+### Feed
+
+![feed](https://github.com/jsurrea/PicScape/assets/68788933/f50c8338-fb61-4af5-b789-90dba7094264)
+
+### Profile
+
+![profile](https://github.com/jsurrea/PicScape/assets/68788933/661fbb53-2f5d-443a-95c8-c8c125faab2f)
+
+### Update
+
+![update](https://github.com/jsurrea/PicScape/assets/68788933/929794c1-f71b-4750-b68d-645fa0502737)
 
 ## Installation
 
