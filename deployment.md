@@ -46,22 +46,22 @@ sudo apt-get update && sudo apt-get upgrade
 
 ### Creating a New User
 
-Create a new user with a home directory with sudo privileges. Replace `<username>` with the desired username:
+Create a new user without a home directory with sudo privileges.
 
 ```bash
-sudo useradd -g sudo -m <username>
+sudo useradd -g sudo -M picscape
 ```
 
 Set a secure password for the new user:
 
 ```bash
-sudo passwd <username>
+sudo passwd picscape
 ```
 
 Log in with the new user:
 
 ```bash
-su <username>
+su picscape
 ```
 
 Change the default shell to bash:
@@ -70,10 +70,12 @@ Change the default shell to bash:
 bash
 ```
 
-Move to your user's home:
+Move to the `/srv/www` directory:
 
 ```bash
-cd ~
+cd /srv
+sudo mkdir www
+sudo chmod 777 www
 ```
 
 ### Installing Dependencies
