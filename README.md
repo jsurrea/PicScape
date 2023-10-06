@@ -80,11 +80,11 @@ Create a PostgreSQL database and update the database settings in `picscape/setti
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your-database',
-        'USER': 'your-db-user',
-        'PASSWORD': 'your-db-password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('PICSCAPE_DB_NAME'),
+        'USER': os.environ.get('PICSCAPE_DB_USER'),
+        'PASSWORD': os.environ.get('PICSCAPE_DB_PASSWORD'),
+        'HOST': os.environ.get('PICSCAPE_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('PICSCAPE_DB_PORT', '5432'),
     }
 }
 ```

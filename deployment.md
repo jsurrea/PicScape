@@ -477,6 +477,14 @@ This will start your Django application with Gunicorn as a background service.
 
 7. Collect Static Files
 
+Return to `picscape` user:
+
+```bash
+exit
+```
+
+Now you should be located at `/srv/www/picscape`. Run the following Django utility:
+
 ```bash
 ./manage.py collectstatic
 ```
