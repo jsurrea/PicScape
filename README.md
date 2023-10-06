@@ -32,7 +32,7 @@ PicScape is a project designed to showcase the power of Django in building a mod
 
 ## Demo
 
-You can see a live demo of PicScape at [https://ec2-52-205-197-58.compute-1.amazonaws.com](https://ec2-52-205-197-58.compute-1.amazonaws.com).
+You can see a live demo of PicScape at [https://ec2-54-84-180-155.compute-1.amazonaws.com](https://ec2-54-84-180-155.compute-1.amazonaws.com).
 
 This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings.
 

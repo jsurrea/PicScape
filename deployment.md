@@ -1,6 +1,6 @@
 # Linux VPS on AWS Setup
 
-For this demonstration, we are using an AWS t2.nano instance with Ubuntu Server. The entire project's configuration resides on a single server, including the database, static files, and source code. In larger projects, it's recommended to separate these components, with the database having its own server, a load balancer for the application, and serving media and static files from a Content Delivery Network (CDN). The installation method shown in this guide can be applied to any Linux server with Ubuntu Server, not just AWS. Any provider that offers access to a Linux machine will work.
+For this demonstration, we are using an AWS t2.micro instance with Ubuntu Server. The entire project's configuration resides on a single server, including the database, static files, and source code. In larger projects, it's recommended to separate these components, with the database having its own server, a load balancer for the application, and serving media and static files from a Content Delivery Network (CDN). The installation method shown in this guide can be applied to any Linux server with Ubuntu Server, not just AWS. Any provider that offers access to a Linux machine will work.
 
 ## Creating the Server
 
@@ -46,10 +46,10 @@ sudo apt-get update && sudo apt-get upgrade
 
 ### Creating a New User
 
-Create a new user without a home directory with sudo privileges. Replace <username> with the desired username:
+Create a new user with a home directory with sudo privileges. Replace `<username>` with the desired username:
 
 ```bash
-sudo useradd -g sudo -M <username>
+sudo useradd -g sudo -m <username>
 ```
 
 Set a secure password for the new user:
@@ -64,10 +64,22 @@ Log in with the new user:
 su <username>
 ```
 
+Change the default shell to bash:
+
+```bash
+bash
+```
+
+Move to your user's home:
+
+```bash
+cd ~
+```
+
 ### Installing Dependencies
 
 ```bash
-sudo apt-get install python3-pip python3-dev postgresql postgresql-contrib libpq-dev git nginx
+sudo apt-get install python3-pip python3-dev postgresql postgresql-contrib libpq-dev git nginx gunicorn
 ```
 
 ## Configure PostgreSQL
@@ -123,3 +135,348 @@ Install `virtualenv`:
 ```bash
 sudo pip3 install virtualenv
 ```
+
+Create a virtual environment:
+
+```bash
+virtualenv -p $(which python3) .venv
+```
+
+Activate the virtual environment:
+
+```bash
+source .venv/bin/activate
+```
+
+### Install Dependencies
+
+Install project dependencies, including those required for Pillow:
+
+```bash
+sudo apt-get install libjpeg-dev
+```
+
+Navigate to the project folder:
+
+```bash
+cd picscape
+```
+
+Install Python project dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Set Environment Variables
+
+Add some environment variables to the `~/.bashrc` file for local testing:
+
+```bash
+vim ~/.bashrc
+```
+
+Add variables similar to the following, replacing them with your actual values:
+
+```bash
+export PICSCAPE_SECRET_KEY="django-insecure-pcd#=y&javeopmt#)*5v7&y-w=d-czug3=$#u5yj#jef&rog_w"
+export PICSCAPE_DB_NAME="picscape"
+export PICSCAPE_DB_USER="my_user"
+export PICSCAPE_DB_PASSWORD="password"
+export PICSCAPE_DB_PORT="5432"
+export PICSCAPE_DB_HOST="localhost"
+export DJANGO_SETTINGS_MODULE="picscape.settings"
+```
+
+Save the file and escape vim with `ESC` key followed by `:wq`.
+
+Reload the variables:
+
+```bash
+source ~/.bashrc
+```
+
+If your virtual environment gets deactivated, reload it:
+
+```bash
+cd ..
+source .venv/bin/activate
+cd picscape/
+```
+
+### Edit Production Settings
+
+Edit the `ALLOWED_HOSTS` variable in the production settings file:
+
+```bash
+vim picscape/settings.py
+```
+
+Update the variable to include your domain or IP:
+
+```python
+ALLOWED_HOSTS = ['ec2-54-84-180-155.compute-1.amazonaws.com']
+```
+
+Save the file and escape vim with `ESC` key followed by `:wq`.
+
+## Sanity Check
+
+Perform the following checks to ensure the project is running correctly:
+
+1. Reflect Django's model in PostgreSQL:
+
+```bash
+./manage.py makemigrations
+./manage.py migrate
+```
+
+2. Create a superuser for administrative access:
+
+```bash
+./manage.py createsuperuser
+```
+
+3. Run the development server:
+
+```bash
+./manage.py runserver 0.0.0.0:8000
+```
+
+4. Run Gunicorn:
+
+```bash
+gunicorn picscape.wsgi -b 0.0.0.0:8000
+```
+
+If everything is configured correctly, steps 3 and 4 should display your site at the specified URL or IP on port 8000.
+
+## Configure Nginx
+
+1. Log in as the superuser:
+
+```bash
+sudo su -
+```
+
+2. Navigate to the Nginx directory:
+
+```bash
+cd /etc/nginx/
+```
+
+3. Remove the old configuration files:
+
+```bash
+rm sites-*/default
+```
+
+4. Create a new Nginx configuration file:
+
+```bash
+vim sites-available/app
+```
+
+Add the following configuration to the file, replacing `ec2-54-84-180-155.compute-1.amazonaws.com` with your domain and the `static` and `media` directories:
+
+```nginx
+upstream django_app {
+    server 127.0.0.1:8000;
+}
+
+server {
+
+    listen 80;
+    server_name ec2-54-84-180-155.compute-1.amazonaws.com;
+
+    access_log /var/log/nginx/app.log;
+    error_log /var/log/nginx/app.error.log;
+
+    location /static {
+        autoindex on;
+        alias /home/picscape/picscape/static/;
+    }
+
+    location /media {
+        autoindex on;
+        alias /home/picscape/picscape/media/;
+    }
+
+    location / {
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+
+        proxy_pass http://django_app;
+    }
+
+}
+```
+
+Save the file and escape vim with `ESC` key followed by `:wq`.
+
+5. Create a symbolic link to enable the configuration:
+
+```bash
+ln -s /etc/nginx/sites-available/app /etc/nginx/sites-enabled/
+```
+
+## Configuring Gunicorn
+
+1. Exit Current Session
+
+```bash
+exit
+```
+
+2. Create the `deploy` and `logs` directories:
+
+```bash
+mkdir deploy logs
+```
+
+3. Create Gunicorn Start Script
+
+```bash
+vim deploy/gunicorn_start
+```
+
+Paste the following content into the file and save it:
+
+```bash
+#!/bin/bash
+
+NAME="picscape"
+VIRTUALENV="/home/picscape/.venv/"
+DJANGODIR="/home/picscape/picscape/"
+USER=picscape
+GROUP=sudo
+NUM_WORKERS=3
+DJANGO_WSGI_MODULE=picscape.wsgi
+
+echo "Starting $NAME as `whoami`"
+
+cd $VIRTUALENV
+source bin/activate
+cd $DJANGODIR
+
+export PICSCAPE_SECRET_KEY="django-insecure-pcd#=y&javeopmt#)*5v7&y-w=d-czug3=$#u5yj#jef&rog_w"
+export PICSCAPE_DB_NAME="picscape"
+export PICSCAPE_DB_USER="my_user"
+export PICSCAPE_DB_PASSWORD="password"
+export PICSCAPE_DB_PORT="5432"
+export PICSCAPE_DB_HOST="localhost"
+
+export DJANGO_SETTINGS_MODULE="picscape.settings"
+
+export PYTHONPATH=$DJANGODIR:$PYTHONPATH
+
+exec gunicorn ${DJANGO_WSGI_MODULE} \
+        --workers $NUM_WORKERS \
+        --user=$USER --group=$GROUP \
+        --log-level=debug \
+        --bind=127.0.0.1:8000
+```
+
+Save the file and escape vim with `ESC` key followed by `:wq`.
+
+4. Make the Script Executable
+
+```bash
+chmod +x deploy/gunicorn_start
+```
+
+5. Test the Script
+
+```bash
+deploy/gunicorn_start
+```
+
+Ensure that Gunicorn starts without errors.
+
+## Creating a Service
+
+1. Switch to Superuser
+
+```bash
+sudo su -
+```
+
+2. Navigate to the Services Directory
+
+```bash
+cd /etc/init.d
+```
+
+3. Create a Service Script
+
+```bash
+vim picscape
+```
+
+Add the following content to the `picscape` file:
+
+```bash
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          picscape
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start PicScape Service
+# Description:       Start the PicScape service.
+### END INIT INFO
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting PicScape Service"
+    /home/picscape/picscape/deploy/gunicorn_start
+    ;;
+  stop)
+    echo "Stopping PicScape Service"
+    # Add any stop commands here, if needed
+    ;;
+  restart)
+    echo "Restarting Platzi Service"
+    /home/picscape/picscape/deploy/gunicorn_start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/platzi {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
+```
+
+Save the file and escape vim with `ESC` key followed by `:wq`.
+
+4. Make the Script Executable
+
+```bash
+sudo chmod +x /etc/init.d/picscape
+```
+
+5. Add the Service to Startup
+
+```bash
+sudo update-rc.d picscape defaults
+```
+
+6. Start the Service
+
+```bash
+sudo service picscape start
+```
+
+This will start your Django application with Gunicorn as a background service.
+
+7. Collect Static Files
+
+```bash
+./manage.py collectstatic
+```
+
+Your Django application should now be running as a service managed by Gunicorn, and Nginx should be serving the application at the specified IP address and port.
