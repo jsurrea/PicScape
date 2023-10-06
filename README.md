@@ -34,7 +34,7 @@ PicScape is a project designed to showcase the power of Django in building a mod
 
 You can see a live demo of PicScape at [https://ec2-54-152-101-7.compute-1.amazonaws.com](https://ec2-54-152-101-7.compute-1.amazonaws.com).
 
-This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings.
+This project also comes configured with a preloaded SQLite database and media files. You can try a full demo with artificial data by installing the app without changing the database settings. The demo comes with 3 users: `JessiTrips`, `DogWorld` and `Bob&Sons`. There's also an `admin` user for accesing the superuser dashboard. All of them have their passwords set to `1234`.
 
 ## Installation
 
@@ -113,7 +113,7 @@ PicScape should now be running locally at `http://localhost:8000/`.
 
 ## Usage
 
-- Access the admin panel at `http://localhost:8000/admin/`` to manage users, photos, and other data.
+- Access the admin panel at `http://localhost:8000/admin/` to manage users, photos, and other data.
 - Sign up for a new user account and start exploring the photo-sharing features.
 - Customize your user profile by adding a profile picture and biography.
 - Follow other users to see their posts in your personalized feed.

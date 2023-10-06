@@ -106,6 +106,7 @@ class ProfileDetailView(LoginRequiredMixin, DetailView):
             followee=followee,
         ).exists()
 
+        context['posts'] = self.get_object().posts.all()
         context['posts_count'] = self.get_object().posts.count()
         context['followers_count'] = self.get_object().followers.count()
         context['following_count'] = self.get_object().following.count()
